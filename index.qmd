@@ -1,11 +1,268 @@
 ---
-title: "aulapurrr"
+title: "Programação funcional no R com purrr"
+authors:
+  - Ariel Levy
+  - Marcus Ramalho
+date: "06/06/2023"
 ---
 
-This is a Quarto website.
+::: columns
+::: {.column width="33%"}
+![](https://d33wubrfki0l68.cloudfront.net/2d0701b616efa7435cd5a94e703baa595a4f9ed0/d41b9/css/images/hex/purrr.png){width="144"}
+:::
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+::: {.column width="33%"}
+![](https://www.tidyverse.org/images/hex-tidyverse.png){width="142"}
+:::
+:::
+
+------------------------------------------------------------------------
 
 ```{r}
-1 + 1
+#| include: false
+library(tidyverse)
+```
+
+# Estruturas de repetição ![](https://media.tenor.com/Xk5vnzCZBjUAAAAC/loop.gif){width="138"}
+
+Em qualquer tarefa ou trabalho é comum nos depararmos com uma atividade extremamente simples, mas que precisa ser repetida diversas vezes para que o trabalho possa ser concluído, em programação não é diferente. Quando começamos a trabalhar com transformações em linhas ou colunas de um banco de dados, por exemplo, temos três opções básicas no r, fazer a transformação elemento por elemento, usar uma das estruturas de repetição como o **for** e **while** que podem ser usados em conjunto com um teste lógico através de funções como **if else** ou ainda usar o pacote **purrr** do tidyverse que oferece recursos para simplificar a escrita e a leitura desse tipo de estrutura.
+
+# Laço simples - FOR
+
+A primeira estrutura de repetição é o for, sua forma é basicamente a mesma em qualquer linguagem de programação, abaixo segue um exemplo do seu uso
+
+<details>
+
+<summary>**Exemplos FOR**</summary>
+
+Estrutura da função for no r
+
+```{r}
+a <- 0
+
+for (i in 1:10) {
+  a <- a + 1
+}
+
+print(a)
+
+```
+
+Visualmente temos:\
+![](https://i.pinimg.com/originals/77/27/31/772731a6b576d3e7836b02edfb200457.png)
+
+Também é possível fazer um loop num objeto de caracteres
+
+```{r}
+nomes <- c("Ana", "André", "Bruna", "João")
+for (nome in nomes) {
+  print(paste("Olá,meu nome é", nome))
+}
+
+```
+
+Veja que a forma como passamos a quantidade de iterações pra função pode variar como nos exemplos abaixo:
+
+Usando a função `seq` que vai gerar um vetor com o número de iterações desejada
+
+```{r}
+a <- 1
+
+for (i in seq(1, 10)) {
+  a <- a + 1
+}
+
+print(a)
+```
+
+Usando a função `length`para obter o tamanho de um objeto para passar essa informação para o FOR.
+
+```{r}
+a <- 1
+iteracoes <- length(1:10)
+
+for (i in 1:iteracoes) {
+  a <- a + 1
+}
+
+print(a)
+
+```
+
+</details>
+
+<details>
+
+<summary>**Exemplo do FOR com data frame no r**</summary>
+
+Neste exemplo, vamos usar o loop "for" para percorrer todas as linhas do conjunto de dados "mpg" e exibir o valor da variável "cty" milhas por galão na cidade para cada carro. Note que a função nrow nos da o número máximo de iterações do nosso laço.
+
+```{r}
+#| eval: false
+
+library(tidyverse)
+for (i in 1:nrow(mpg)) {
+  cty_value <- mpg$cty[i]*2
+  print(cty_value)
+}
+
+```
+
+</details>
+
+# Laço com teste lógico ou condição - WHILE
+
+A segunda estrutura de repetição é o while, diferente do for, aqui a condição para que o que esta dentro da estrutura seja executado deve ser explicita, além disso podemos cair num loop infinito caso a condição nunca seja atendida.
+
+<details>
+
+<summary>**Exemplos WHILE**</summary>
+
+Estrutura da função while no r
+
+::: callout-important
+## Importante!!
+
+veja que a função será executada enquanto a condição passada para ela for atendida, ou seja, enquanto for verdadeira. Se a condição for sempre verdadeira, entraremos num loop infinito.
+:::
+
+```{r}
+contador <- 1
+while (contador <= 5) {
+  print(contador)
+  contador <- contador + 1
+}
+
+```
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/v-K-4KuA8mQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+
+</iframe>
+
+Outro exemplo:
+
+```{r}
+#| eval: false
+soma <- 0
+while (soma < 10) {
+  numero <- readline(prompt = "Digite um número: ")
+  numero <- as.numeric(numero)
+  soma <- soma + numero
+}
+print(soma)
+
+```
+
+</details>
+
+<details>
+
+<summary>**Exemplo do WHILE com data frame no r**</summary>
+
+Vamos usar o loop "while" para iterar pelo conjunto de dados "mpg" até encontrarmos um carro com milhas por galão na estrada (variável "hwy") maior que 30 milhas.
+
+```{r}
+#| eval: false
+
+library(tidyverse)
+
+i <- 1
+
+while (mpg$hwy[i] <= 30) {
+  i <- i + 1
+}
+
+car_model <- mpg$model[i]
+print(car_model)
+
+
+```
+
+</details>
+
+# purrr
+
+Como vimos nos itens anteriores as funções for e while nos permitem passear e aplicar funções ou operações em vários itens de um objeto. O pacote purrr nos permite fazer o mesmo, so que de forma muito mais simples e prática, diminuindo a quantidade de código e facilitando a leitura.
+
+Vamos começar listando as funções do pacote, porém, vamos nos ater apenas às mais importantes para as nossas aplicações.
+
+<details>
+
+<summary>**Funções do pacote purrr**</summary>
+
+```{r}
+library(purrr)
+fcs <- ls("package:purrr")
+fcs
+
+
+```
+
+</details>
+
+## map
+
+No pacote purr, map é uma função, mas também é uma família de funções, seu objetivo é aplicar uma função em cada elemento de um objeto, retornando um objeto do mesmo tamanho do objeto de entrada.
+
+<details>
+
+<summary>**Sintaxe segundo a documentação:**</summary>
+
+`map(.x, .f, …, .progress = FALSE)`
+
+`.x` : é uma lista ou um vetor
+
+`.f` : Uma função, especificada de uma das seguintes maneiras:
+
+Uma função nomeada, por exemplo, `mean`.
+
+Uma função anônima, por exemplo, `\(x) x + 1 ou function(x) x + 1`.
+
+::: callout-tip
+## Função anônima
+
+Uma função anônima no R é uma função que não possui um nome específico e é definida no local onde é utilizada. Ela é criada de forma concisa e temporária, geralmente como argumento de outra função. Ela é útil quando precisamos executar uma operação simples em um conjunto de dados sem a necessidade de definir uma função separada.
+:::
+
+Uma fórmula, por exemplo, `~ .x + 1`. Você deve usar `.x` para se referir ao primeiro argumento. ***Recomendado apenas se você precisar de compatibilidade com versões mais antigas do R.***
+
+Uma string, inteiro ou lista, por exemplo, `"idx"`, `1` ou `list("idx", 1)`, que são formas abreviadas de `\(x) pluck(x, "idx")`, `(x) pluck(x, 1)` e `\(x) pluck(x, "idx", 1)`, respectivamente. Opcionalmente, você pode fornecer .default para definir um valor padrão caso o elemento indexado seja NULL ou não exista.
+
+`…` : Argumentos adicionais repassados para a função mapeada.
+
+Atualmente, geralmente não recomendamos o uso de \... para passar argumentos adicionais (constantes) para .f. Em vez disso, use uma função anônima simplificada:
+
+```{r}
+#| eval: false
+# Ao invés de:
+x %>%  map(f, 1, 2, collapse = ",")
+# faça:
+x %>%  map(\(x) f(x, 1, 2, collapse = ","))
+```
+
+Isso torna mais fácil entender quais argumentos pertencem a qual função e geralmente resulta em mensagens de erro mais claras.
+
+</details>
+
+Por padrão map sempre retorna uma lista, podemos extrair os objetos da lista usando a função reduce do próprio purrr ou usando uma das funções da família map para cada tipo de objeto como pode ser visto nos exemplos abaixo.
+
+no primeiro exemplo vamos printar todas as funções do pacote purrr que contem a palavra map.
+
+```{r}
+fcs_map <- map(fcs, \(x) str_detect(x, "map"))
+fcs_map <- fcs[unlist(fcs_map)]
+fcs_map
+
+```
+
+Nesse caso usamos a função unlist para obter um vetor que contem valores lógicos em cada observação, como o número de observações é o mesmo que o vetor de funções do purrr podemos usar isso para acessar apenas as posições em que ocorre a palavra map.
+
+## Variações de map
+
+```{r}
+mtcars |>
+  split(mtcars$cyl) |>
+  map(\(df) lm(mpg ~ wt, data = df)) |>
+  map(summary) |>
+  map_dbl("r.squared")
 ```

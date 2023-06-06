@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.326">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-06-06">
+
+<title>Laços e recursão - Programação funcional no R com purrr</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Laços e recursão</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#estruturas-de-repetição" id="toc-estruturas-de-repetição" class="nav-link active" data-scroll-target="#estruturas-de-repetição">Estruturas de repetição <img src="https://media.tenor.com/Xk5vnzCZBjUAAAAC/loop.gif" class="img-fluid" width="138"></a></li>
+  <li><a href="#laço-simples---for" id="toc-laço-simples---for" class="nav-link" data-scroll-target="#laço-simples---for">Laço simples - FOR</a></li>
+  <li><a href="#laço-com-teste-lógico-ou-condição---while" id="toc-laço-com-teste-lógico-ou-condição---while" class="nav-link" data-scroll-target="#laço-com-teste-lógico-ou-condição---while">Laço com teste lógico ou condição - WHILE</a></li>
+  <li><a href="#purrr" id="toc-purrr" class="nav-link" data-scroll-target="#purrr">purrr</a>
+  <ul class="collapse">
+  <li><a href="#map" id="toc-map" class="nav-link" data-scroll-target="#map">map</a></li>
+  <li><a href="#variações-de-map" id="toc-variações-de-map" class="nav-link" data-scroll-target="#variações-de-map">Variações de map</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Programação funcional no R com purrr</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ariel Levy </p>
+             <p>Marcus Ramalho </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 6, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="columns">
+<div class="column" style="width:33%;">
+<p><img src="https://d33wubrfki0l68.cloudfront.net/2d0701b616efa7435cd5a94e703baa595a4f9ed0/d41b9/css/images/hex/purrr.png" class="img-fluid" width="144"></p>
+</div><div class="column" style="width:33%;">
+<p><img src="https://www.tidyverse.org/images/hex-tidyverse.png" class="img-fluid" width="142"></p>
+</div>
+</div>
+<hr>
+<section id="estruturas-de-repetição" class="level1">
+<h1>Estruturas de repetição <img src="https://media.tenor.com/Xk5vnzCZBjUAAAAC/loop.gif" class="img-fluid" width="138"></h1>
+<p>Em qualquer tarefa ou trabalho é comum nos depararmos com uma atividade extremamente simples, mas que precisa ser repetida diversas vezes para que o trabalho possa ser concluído, em programação não é diferente. Quando começamos a trabalhar com transformações em linhas ou colunas de um banco de dados, por exemplo, temos três opções básicas no r, fazer a transformação elemento por elemento, usar uma das estruturas de repetição como o <strong>for</strong> e <strong>while</strong> que podem ser usados em conjunto com um teste lógico através de funções como <strong>if else</strong> ou ainda usar o pacote <strong>purrr</strong> do tidyverse que oferece recursos para simplificar a escrita e a leitura desse tipo de estrutura.</p>
+</section>
+<section id="laço-simples---for" class="level1">
+<h1>Laço simples - FOR</h1>
+<p>A primeira estrutura de repetição é o for, sua forma é basicamente a mesma em qualquer linguagem de programação, abaixo segue um exemplo do seu uso</p>
+<details>
+<summary>
+<strong>Exemplos FOR</strong>
+</summary>
+<p>Estrutura da função for no r</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> a <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10</code></pre>
+</div>
+</div>
+<p>Visualmente temos:<br>
+<img src="https://i.pinimg.com/originals/77/27/31/772731a6b576d3e7836b02edfb200457.png" class="img-fluid"></p>
+<p>Também é possível fazer um loop num objeto de caracteres</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nomes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ana"</span>, <span class="st">"André"</span>, <span class="st">"Bruna"</span>, <span class="st">"João"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (nome <span class="cf">in</span> nomes) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Olá,meu nome é"</span>, nome))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Olá,meu nome é Ana"
+[1] "Olá,meu nome é André"
+[1] "Olá,meu nome é Bruna"
+[1] "Olá,meu nome é João"</code></pre>
+</div>
+</div>
+<p>Veja que a forma como passamos a quantidade de iterações pra função pode variar como nos exemplos abaixo:</p>
+<p>Usando a função <code>seq</code> que vai gerar um vetor com o número de iterações desejada</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>)) {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> a <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11</code></pre>
+</div>
+</div>
+<p>Usando a função <code>length</code>para obter o tamanho de um objeto para passar essa informação para o FOR.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>iteracoes <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>iteracoes) {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> a <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11</code></pre>
+</div>
+</div>
+</details>
+<details>
+<summary>
+<strong>Exemplo do FOR com data frame no r</strong>
+</summary>
+<p>Neste exemplo, vamos usar o loop “for” para percorrer todas as linhas do conjunto de dados “mpg” e exibir o valor da variável “cty” milhas por galão na cidade para cada carro. Note que a função nrow nos da o número máximo de iterações do nosso laço.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(mpg)) {</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  cty_value <span class="ot">&lt;-</span> mpg<span class="sc">$</span>cty[i]<span class="sc">*</span><span class="dv">2</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(cty_value)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+</section>
+<section id="laço-com-teste-lógico-ou-condição---while" class="level1">
+<h1>Laço com teste lógico ou condição - WHILE</h1>
+<p>A segunda estrutura de repetição é o while, diferente do for, aqui a condição para que o que esta dentro da estrutura seja executado deve ser explicita, além disso podemos cair num loop infinito caso a condição nunca seja atendida.</p>
+<details>
+<summary>
+<strong>Exemplos WHILE</strong>
+</summary>
+<p>Estrutura da função while no r</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Importante!!
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>veja que a função será executada enquanto a condição passada para ela for atendida, ou seja, enquanto for verdadeira. Se a condição for sempre verdadeira, entraremos num loop infinito.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>contador <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (contador <span class="sc">&lt;=</span> <span class="dv">5</span>) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(contador)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  contador <span class="ot">&lt;-</span> contador <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5</code></pre>
+</div>
+</div>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/v-K-4KuA8mQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
+</iframe>
+<p>Outro exemplo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>soma <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (soma <span class="sc">&lt;</span> <span class="dv">10</span>) {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  numero <span class="ot">&lt;-</span> <span class="fu">readline</span>(<span class="at">prompt =</span> <span class="st">"Digite um número: "</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  numero <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(numero)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  soma <span class="ot">&lt;-</span> soma <span class="sc">+</span> numero</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(soma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+<details>
+<summary>
+<strong>Exemplo do WHILE com data frame no r</strong>
+</summary>
+<p>Vamos usar o loop “while” para iterar pelo conjunto de dados “mpg” até encontrarmos um carro com milhas por galão na estrada (variável “hwy”) maior que 30 milhas.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (mpg<span class="sc">$</span>hwy[i] <span class="sc">&lt;=</span> <span class="dv">30</span>) {</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  i <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>car_model <span class="ot">&lt;-</span> mpg<span class="sc">$</span>model[i]</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(car_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+</section>
+<section id="purrr" class="level1">
+<h1>purrr</h1>
+<p>Como vimos nos itens anteriores as funções for e while nos permitem passear e aplicar funções ou operações em vários itens de um objeto. O pacote purrr nos permite fazer o mesmo, so que de forma muito mais simples e prática, diminuindo a quantidade de código e facilitando a leitura.</p>
+<p>Vamos começar listando as funções do pacote, porém, vamos nos ater apenas às mais importantes para as nossas aplicações.</p>
+<details>
+<summary>
+<strong>Funções do pacote purrr</strong>
+</summary>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>fcs <span class="ot">&lt;-</span> <span class="fu">ls</span>(<span class="st">"package:purrr"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>fcs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "%@%"                 "%||%"                "%&gt;%"                
+  [4] "accumulate"          "accumulate_right"    "accumulate2"        
+  [7] "array_branch"        "array_tree"          "as_mapper"          
+ [10] "as_vector"           "assign_in"           "at_depth"           
+ [13] "attr_getter"         "auto_browse"         "chuck"              
+ [16] "compact"             "compose"             "cross"              
+ [19] "cross_d"             "cross_df"            "cross_n"            
+ [22] "cross2"              "cross3"              "detect"             
+ [25] "detect_index"        "discard"             "discard_at"         
+ [28] "done"                "every"               "exec"               
+ [31] "flatten"             "flatten_chr"         "flatten_dbl"        
+ [34] "flatten_df"          "flatten_dfc"         "flatten_dfr"        
+ [37] "flatten_int"         "flatten_lgl"         "flatten_raw"        
+ [40] "has_element"         "head_while"          "imap"               
+ [43] "imap_chr"            "imap_dbl"            "imap_dfc"           
+ [46] "imap_dfr"            "imap_int"            "imap_lgl"           
+ [49] "imap_raw"            "imodify"             "insistently"        
+ [52] "invoke"              "invoke_map"          "invoke_map_chr"     
+ [55] "invoke_map_dbl"      "invoke_map_df"       "invoke_map_dfc"     
+ [58] "invoke_map_dfr"      "invoke_map_int"      "invoke_map_lgl"     
+ [61] "invoke_map_raw"      "is_atomic"           "is_bare_atomic"     
+ [64] "is_bare_character"   "is_bare_double"      "is_bare_integer"    
+ [67] "is_bare_list"        "is_bare_logical"     "is_bare_numeric"    
+ [70] "is_bare_vector"      "is_character"        "is_double"          
+ [73] "is_empty"            "is_formula"          "is_function"        
+ [76] "is_integer"          "is_list"             "is_logical"         
+ [79] "is_null"             "is_rate"             "is_scalar_atomic"   
+ [82] "is_scalar_character" "is_scalar_double"    "is_scalar_integer"  
+ [85] "is_scalar_list"      "is_scalar_logical"   "is_scalar_vector"   
+ [88] "is_vector"           "iwalk"               "keep"               
+ [91] "keep_at"             "lift"                "lift_dl"            
+ [94] "lift_dv"             "lift_ld"             "lift_lv"            
+ [97] "lift_vd"             "lift_vl"             "list_along"         
+[100] "list_assign"         "list_c"              "list_cbind"         
+[103] "list_flatten"        "list_merge"          "list_modify"        
+[106] "list_rbind"          "list_simplify"       "list_transpose"     
+[109] "lmap"                "lmap_at"             "lmap_if"            
+[112] "map"                 "map_at"              "map_chr"            
+[115] "map_dbl"             "map_depth"           "map_df"             
+[118] "map_dfc"             "map_dfr"             "map_if"             
+[121] "map_int"             "map_lgl"             "map_raw"            
+[124] "map_vec"             "map2"                "map2_chr"           
+[127] "map2_dbl"            "map2_df"             "map2_dfc"           
+[130] "map2_dfr"            "map2_int"            "map2_lgl"           
+[133] "map2_raw"            "map2_vec"            "modify"             
+[136] "modify_at"           "modify_depth"        "modify_if"          
+[139] "modify_in"           "modify_tree"         "modify2"            
+[142] "negate"              "none"                "partial"            
+[145] "pluck"               "pluck_depth"         "pluck_exists"       
+[148] "pluck&lt;-"             "pmap"                "pmap_chr"           
+[151] "pmap_dbl"            "pmap_df"             "pmap_dfc"           
+[154] "pmap_dfr"            "pmap_int"            "pmap_lgl"           
+[157] "pmap_raw"            "pmap_vec"            "possibly"           
+[160] "prepend"             "pwalk"               "quietly"            
+[163] "rate_backoff"        "rate_delay"          "rate_reset"         
+[166] "rate_sleep"          "rbernoulli"          "rdunif"             
+[169] "reduce"              "reduce_right"        "reduce2"            
+[172] "reduce2_right"       "rep_along"           "rerun"              
+[175] "safely"              "set_names"           "simplify"           
+[178] "simplify_all"        "slowly"              "some"               
+[181] "splice"              "tail_while"          "transpose"          
+[184] "update_list"         "vec_depth"           "walk"               
+[187] "walk2"               "when"                "zap"                </code></pre>
+</div>
+</div>
+</details>
+<section id="map" class="level2">
+<h2 class="anchored" data-anchor-id="map">map</h2>
+<p>No pacote purr, map é uma função, mas também é uma família de funções, seu objetivo é aplicar uma função em cada elemento de um objeto, retornando um objeto do mesmo tamanho do objeto de entrada.</p>
+<details>
+<summary>
+<strong>Sintaxe segundo a documentação:</strong>
+</summary>
+<p><code>map(.x, .f, …, .progress = FALSE)</code></p>
+<p><code>.x</code> : é uma lista ou um vetor</p>
+<p><code>.f</code> : Uma função, especificada de uma das seguintes maneiras:</p>
+<p>Uma função nomeada, por exemplo, <code>mean</code>.</p>
+<p>Uma função anônima, por exemplo, <code>\(x) x + 1 ou function(x) x + 1</code>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Função anônima
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Uma função anônima no R é uma função que não possui um nome específico e é definida no local onde é utilizada. Ela é criada de forma concisa e temporária, geralmente como argumento de outra função. Ela é útil quando precisamos executar uma operação simples em um conjunto de dados sem a necessidade de definir uma função separada.</p>
+</div>
+</div>
+<p>Uma fórmula, por exemplo, <code>~ .x + 1</code>. Você deve usar <code>.x</code> para se referir ao primeiro argumento. <strong><em>Recomendado apenas se você precisar de compatibilidade com versões mais antigas do R.</em></strong></p>
+<p>Uma string, inteiro ou lista, por exemplo, <code>"idx"</code>, <code>1</code> ou <code>list("idx", 1)</code>, que são formas abreviadas de <code>\(x) pluck(x, "idx")</code>, <code>(x) pluck(x, 1)</code> e <code>\(x) pluck(x, "idx", 1)</code>, respectivamente. Opcionalmente, você pode fornecer .default para definir um valor padrão caso o elemento indexado seja NULL ou não exista.</p>
+<p><code>…</code> : Argumentos adicionais repassados para a função mapeada.</p>
+<p>Atualmente, geralmente não recomendamos o uso de ... para passar argumentos adicionais (constantes) para .f. Em vez disso, use uma função anônima simplificada:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ao invés de:</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%&gt;%</span>  <span class="fu">map</span>(f, <span class="dv">1</span>, <span class="dv">2</span>, <span class="at">collapse =</span> <span class="st">","</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># faça:</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%&gt;%</span>  <span class="fu">map</span>(\(x) <span class="fu">f</span>(x, <span class="dv">1</span>, <span class="dv">2</span>, <span class="at">collapse =</span> <span class="st">","</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Isso torna mais fácil entender quais argumentos pertencem a qual função e geralmente resulta em mensagens de erro mais claras.</p>
+</details>
+<p>Por padrão map sempre retorna uma lista, podemos extrair os objetos da lista usando a função reduce do próprio purrr ou usando uma das funções da família map para cada tipo de objeto como pode ser visto nos exemplos abaixo.</p>
+<p>no primeiro exemplo vamos printar todas as funções do pacote purrr que contem a palavra map.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fcs_map <span class="ot">&lt;-</span> <span class="fu">map</span>(fcs, \(x) <span class="fu">str_detect</span>(x, <span class="st">"map"</span>))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fcs_map <span class="ot">&lt;-</span> fcs[<span class="fu">unlist</span>(fcs_map)]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>fcs_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "as_mapper"      "imap"           "imap_chr"       "imap_dbl"      
+ [5] "imap_dfc"       "imap_dfr"       "imap_int"       "imap_lgl"      
+ [9] "imap_raw"       "invoke_map"     "invoke_map_chr" "invoke_map_dbl"
+[13] "invoke_map_df"  "invoke_map_dfc" "invoke_map_dfr" "invoke_map_int"
+[17] "invoke_map_lgl" "invoke_map_raw" "lmap"           "lmap_at"       
+[21] "lmap_if"        "map"            "map_at"         "map_chr"       
+[25] "map_dbl"        "map_depth"      "map_df"         "map_dfc"       
+[29] "map_dfr"        "map_if"         "map_int"        "map_lgl"       
+[33] "map_raw"        "map_vec"        "map2"           "map2_chr"      
+[37] "map2_dbl"       "map2_df"        "map2_dfc"       "map2_dfr"      
+[41] "map2_int"       "map2_lgl"       "map2_raw"       "map2_vec"      
+[45] "pmap"           "pmap_chr"       "pmap_dbl"       "pmap_df"       
+[49] "pmap_dfc"       "pmap_dfr"       "pmap_int"       "pmap_lgl"      
+[53] "pmap_raw"       "pmap_vec"      </code></pre>
+</div>
+</div>
+<p>Nesse caso usamos a função unlist para obter um vetor que contem valores lógicos em cada observação, como o número de observações é o mesmo que o vetor de funções do purrr podemos usar isso para acessar apenas as posições em que ocorre a palavra map.</p>
+</section>
+<section id="variações-de-map" class="level2">
+<h2 class="anchored" data-anchor-id="variações-de-map">Variações de map</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">split</span>(mtcars<span class="sc">$</span>cyl) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(\(df) <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> df)) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(summary) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dbl</span>(<span class="st">"r.squared"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        4         6         8 
+0.5086326 0.4645102 0.4229655 </code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

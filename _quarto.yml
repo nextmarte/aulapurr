@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "aulapurrr"
+  title: "Laços e recursão"
   navbar:
     left:
       - href: index.qmd

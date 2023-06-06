@@ -1,0 +1,23 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "index.html#map",
+    "href": "index.html#map",
+    "title": "Programação funcional no R com purrr",
+    "section": "map",
+    "text": "map\nNo pacote purr, map é uma função, mas também é uma família de funções, seu objetivo é aplicar uma função em cada elemento de um objeto, retornando um objeto do mesmo tamanho do objeto de entrada.\n\n\nSintaxe segundo a documentação:\n\nmap(.x, .f, …, .progress = FALSE)\n.x : é uma lista ou um vetor\n.f : Uma função, especificada de uma das seguintes maneiras:\nUma função nomeada, por exemplo, mean.\nUma função anônima, por exemplo, \\(x) x + 1 ou function(x) x + 1.\n\n\n\n\n\n\nFunção anônima\n\n\n\nUma função anônima no R é uma função que não possui um nome específico e é definida no local onde é utilizada. Ela é criada de forma concisa e temporária, geralmente como argumento de outra função. Ela é útil quando precisamos executar uma operação simples em um conjunto de dados sem a necessidade de definir uma função separada.\n\n\nUma fórmula, por exemplo, ~ .x + 1. Você deve usar .x para se referir ao primeiro argumento. Recomendado apenas se você precisar de compatibilidade com versões mais antigas do R.\nUma string, inteiro ou lista, por exemplo, \"idx\", 1 ou list(\"idx\", 1), que são formas abreviadas de \\(x) pluck(x, \"idx\"), (x) pluck(x, 1) e \\(x) pluck(x, \"idx\", 1), respectivamente. Opcionalmente, você pode fornecer .default para definir um valor padrão caso o elemento indexado seja NULL ou não exista.\n… : Argumentos adicionais repassados para a função mapeada.\nAtualmente, geralmente não recomendamos o uso de ... para passar argumentos adicionais (constantes) para .f. Em vez disso, use uma função anônima simplificada:\n\n# Ao invés de:\nx %&gt;%  map(f, 1, 2, collapse = \",\")\n# faça:\nx %&gt;%  map(\\(x) f(x, 1, 2, collapse = \",\"))\n\nIsso torna mais fácil entender quais argumentos pertencem a qual função e geralmente resulta em mensagens de erro mais claras.\n\nPor padrão map sempre retorna uma lista, podemos extrair os objetos da lista usando a função reduce do próprio purrr ou usando uma das funções da família map para cada tipo de objeto como pode ser visto nos exemplos abaixo.\nno primeiro exemplo vamos printar todas as funções do pacote purrr que contem a palavra map.\n\nfcs_map &lt;- map(fcs, \\(x) str_detect(x, \"map\"))\nfcs_map &lt;- fcs[unlist(fcs_map)]\nfcs_map\n\n [1] \"as_mapper\"      \"imap\"           \"imap_chr\"       \"imap_dbl\"      \n [5] \"imap_dfc\"       \"imap_dfr\"       \"imap_int\"       \"imap_lgl\"      \n [9] \"imap_raw\"       \"invoke_map\"     \"invoke_map_chr\" \"invoke_map_dbl\"\n[13] \"invoke_map_df\"  \"invoke_map_dfc\" \"invoke_map_dfr\" \"invoke_map_int\"\n[17] \"invoke_map_lgl\" \"invoke_map_raw\" \"lmap\"           \"lmap_at\"       \n[21] \"lmap_if\"        \"map\"            \"map_at\"         \"map_chr\"       \n[25] \"map_dbl\"        \"map_depth\"      \"map_df\"         \"map_dfc\"       \n[29] \"map_dfr\"        \"map_if\"         \"map_int\"        \"map_lgl\"       \n[33] \"map_raw\"        \"map_vec\"        \"map2\"           \"map2_chr\"      \n[37] \"map2_dbl\"       \"map2_df\"        \"map2_dfc\"       \"map2_dfr\"      \n[41] \"map2_int\"       \"map2_lgl\"       \"map2_raw\"       \"map2_vec\"      \n[45] \"pmap\"           \"pmap_chr\"       \"pmap_dbl\"       \"pmap_df\"       \n[49] \"pmap_dfc\"       \"pmap_dfr\"       \"pmap_int\"       \"pmap_lgl\"      \n[53] \"pmap_raw\"       \"pmap_vec\"      \n\n\nNesse caso usamos a função unlist para obter um vetor que contem valores lógicos em cada observação, como o número de observações é o mesmo que o vetor de funções do purrr podemos usar isso para acessar apenas as posições em que ocorre a palavra map."
+  },
+  {
+    "objectID": "index.html#variações-de-map",
+    "href": "index.html#variações-de-map",
+    "title": "Programação funcional no R com purrr",
+    "section": "Variações de map",
+    "text": "Variações de map\n\nmtcars |&gt;\n  split(mtcars$cyl) |&gt;\n  map(\\(df) lm(mpg ~ wt, data = df)) |&gt;\n  map(summary) |&gt;\n  map_dbl(\"r.squared\")\n\n        4         6         8 \n0.5086326 0.4645102 0.4229655"
+  }
+]
