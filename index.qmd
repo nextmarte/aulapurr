@@ -1,9 +1,10 @@
 ---
-title: "Programação funcional no R com purrr"
+title: "Introdução programação funcional no R com purrr"
 authors:
   - Ariel Levy
   - Marcus Ramalho
 date: "06/06/2023"
+bibliography: references.bib
 ---
 
 ::: columns
@@ -25,7 +26,7 @@ library(tidyverse)
 
 # Estruturas de repetição ![](https://media.tenor.com/Xk5vnzCZBjUAAAAC/loop.gif){width="138"}
 
-Em qualquer tarefa ou trabalho é comum nos depararmos com uma atividade extremamente simples, mas que precisa ser repetida diversas vezes para que o trabalho possa ser concluído, em programação não é diferente. Quando começamos a trabalhar com transformações em linhas ou colunas de um banco de dados, por exemplo, temos três opções básicas no r, fazer a transformação elemento por elemento, usar uma das estruturas de repetição como o **for** e **while** que podem ser usados em conjunto com um teste lógico através de funções como **if else** ou ainda usar o pacote **purrr** do tidyverse que oferece recursos para simplificar a escrita e a leitura desse tipo de estrutura.
+Em qualquer tarefa ou trabalho é comum nos depararmos com uma atividade extremamente simples, mas que precisa ser repetida diversas vezes para que o trabalho possa ser concluído, em programação não é diferente. Quando começamos a trabalhar com transformações em linhas ou colunas de um banco de dados, por exemplo, temos três opções básicas no r, fazer a transformação elemento por elemento, usar uma das estruturas de repetição como o **for** e **while** que podem ser usados em conjunto com um teste lógico através de funções como **if else** ou ainda usar o pacote **purrr** [@purrr]do **tidyverse**[@tidyverse] que oferece recursos para simplificar a escrita e a leitura desse tipo de estrutura.
 
 # Laço simples - FOR
 
@@ -135,6 +136,8 @@ while (contador <= 5) {
 
 ```
 
+Exemplo em vídeo[@transcode2021]
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/v-K-4KuA8mQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
 
 </iframe>
@@ -204,6 +207,12 @@ fcs
 
 No pacote purr, map é uma função, mas também é uma família de funções, seu objetivo é aplicar uma função em cada elemento de um objeto, retornando um objeto do mesmo tamanho do objeto de entrada.
 
+## Família map
+
+`map_lgl()`, `map_int()`, `map_dbl()` and `map_chr()`
+
+A diferença entre map e suas variantes é principalmente o objeto que encontramos na saída, enquanto podemos usar funções auxiliáres do próprio purrr para obter os valores obtidos nas listas criadas com map também podemos usar as outras funções da família map para pular essa etapa.
+
 <details>
 
 <summary>**Sintaxe segundo a documentação:**</summary>
@@ -244,9 +253,11 @@ Isso torna mais fácil entender quais argumentos pertencem a qual função e ger
 
 </details>
 
-Por padrão map sempre retorna uma lista, podemos extrair os objetos da lista usando a função reduce do próprio purrr ou usando uma das funções da família map para cada tipo de objeto como pode ser visto nos exemplos abaixo.
+## Exemplos
 
-no primeiro exemplo vamos printar todas as funções do pacote purrr que contem a palavra map.
+Por padrão a função map sempre retorna uma lista, podemos extrair os objetos da lista usando a função reduce do próprio purrr ou usando uma das funções da família map para cada tipo de objeto como pode ser visto nos exemplos abaixo.
+
+no primeiro exemplo vamos printar todas as funções do pacote purrr que contêm a palavra map.
 
 ```{r}
 fcs_map <- map(fcs, \(x) str_detect(x, "map"))
@@ -257,12 +268,32 @@ fcs_map
 
 Nesse caso usamos a função unlist para obter um vetor que contem valores lógicos em cada observação, como o número de observações é o mesmo que o vetor de funções do purrr podemos usar isso para acessar apenas as posições em que ocorre a palavra map.
 
-## Variações de map
+## Exemplo prático com visualização de dados
+
+<details>
+
+<summary> gráficos múltiplos </summary>
 
 ```{r}
-mtcars |>
-  split(mtcars$cyl) |>
-  map(\(df) lm(mpg ~ wt, data = df)) |>
-  map(summary) |>
-  map_dbl("r.squared")
+#| message: false
+# Função para plotar um histograma para uma coluna numérica do nosso df
+plot_histogram <- function(x) {
+  plot <- ggplot(data.frame(x = x), aes(x = x)) + 
+    geom_histogram()
+  return(plot)
+}
+
+# Aplica a função a cada coluna numérica 
+result <- map_if(mtcars, is.numeric, plot_histogram)
+result
 ```
+
+</details>
+
+# Outras referências...
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/bzUmK0Y07ck" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+
+
+# 

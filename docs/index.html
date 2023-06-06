@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2023-06-06">
 
-<title>Laços e recursão - Programação funcional no R com purrr</title>
+<title>Laços e recursão - Introdução programação funcional no R com purrr</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -55,7 +55,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -119,10 +138,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
  <span class="menu-text">Home</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html" rel="" target="">
- <span class="menu-text">About</span></a>
-  </li>  
 </ul>
             <div class="quarto-navbar-tools ms-auto">
 </div>
@@ -145,8 +160,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#purrr" id="toc-purrr" class="nav-link" data-scroll-target="#purrr">purrr</a>
   <ul class="collapse">
   <li><a href="#map" id="toc-map" class="nav-link" data-scroll-target="#map">map</a></li>
-  <li><a href="#variações-de-map" id="toc-variações-de-map" class="nav-link" data-scroll-target="#variações-de-map">Variações de map</a></li>
+  <li><a href="#família-map" id="toc-família-map" class="nav-link" data-scroll-target="#família-map">Família map</a></li>
+  <li><a href="#exemplos" id="toc-exemplos" class="nav-link" data-scroll-target="#exemplos">Exemplos</a></li>
+  <li><a href="#exemplo-prático-com-visualização-de-dados" id="toc-exemplo-prático-com-visualização-de-dados" class="nav-link" data-scroll-target="#exemplo-prático-com-visualização-de-dados">Exemplo prático com visualização de dados</a></li>
   </ul></li>
+  <li><a href="#outras-referências" id="toc-outras-referências" class="nav-link" data-scroll-target="#outras-referências">Outras referências…</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"></a></li>
   </ul>
 </nav>
     </div>
@@ -155,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Programação funcional no R com purrr</h1>
+<h1 class="title">Introdução programação funcional no R com purrr</h1>
 </div>
 
 
@@ -193,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 <section id="estruturas-de-repetição" class="level1">
 <h1>Estruturas de repetição <img src="https://media.tenor.com/Xk5vnzCZBjUAAAAC/loop.gif" class="img-fluid" width="138"></h1>
-<p>Em qualquer tarefa ou trabalho é comum nos depararmos com uma atividade extremamente simples, mas que precisa ser repetida diversas vezes para que o trabalho possa ser concluído, em programação não é diferente. Quando começamos a trabalhar com transformações em linhas ou colunas de um banco de dados, por exemplo, temos três opções básicas no r, fazer a transformação elemento por elemento, usar uma das estruturas de repetição como o <strong>for</strong> e <strong>while</strong> que podem ser usados em conjunto com um teste lógico através de funções como <strong>if else</strong> ou ainda usar o pacote <strong>purrr</strong> do tidyverse que oferece recursos para simplificar a escrita e a leitura desse tipo de estrutura.</p>
+<p>Em qualquer tarefa ou trabalho é comum nos depararmos com uma atividade extremamente simples, mas que precisa ser repetida diversas vezes para que o trabalho possa ser concluído, em programação não é diferente. Quando começamos a trabalhar com transformações em linhas ou colunas de um banco de dados, por exemplo, temos três opções básicas no r, fazer a transformação elemento por elemento, usar uma das estruturas de repetição como o <strong>for</strong> e <strong>while</strong> que podem ser usados em conjunto com um teste lógico através de funções como <strong>if else</strong> ou ainda usar o pacote <strong>purrr</strong> <span class="citation" data-cites="purrr">(<a href="#ref-purrr" role="doc-biblioref">Wickham and Henry 2023</a>)</span>do <strong>tidyverse</strong><span class="citation" data-cites="tidyverse">(<a href="#ref-tidyverse" role="doc-biblioref">Wickham et al. 2019</a>)</span> que oferece recursos para simplificar a escrita e a leitura desse tipo de estrutura.</p>
 </section>
 <section id="laço-simples---for" class="level1">
 <h1>Laço simples - FOR</h1>
@@ -308,6 +327,7 @@ Importante!!
 [1] 5</code></pre>
 </div>
 </div>
+<p>Exemplo em vídeo<span class="citation" data-cites="transcode2021">(<a href="#ref-transcode2021" role="doc-biblioref">Transcode 2021</a>)</span></p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/v-K-4KuA8mQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
 </iframe>
 <p>Outro exemplo:</p>
@@ -422,6 +442,11 @@ Importante!!
 <section id="map" class="level2">
 <h2 class="anchored" data-anchor-id="map">map</h2>
 <p>No pacote purr, map é uma função, mas também é uma família de funções, seu objetivo é aplicar uma função em cada elemento de um objeto, retornando um objeto do mesmo tamanho do objeto de entrada.</p>
+</section>
+<section id="família-map" class="level2">
+<h2 class="anchored" data-anchor-id="família-map">Família map</h2>
+<p><code>map_lgl()</code>,&nbsp;<code>map_int()</code>,&nbsp;<code>map_dbl()</code>&nbsp;and&nbsp;<code>map_chr()</code></p>
+<p>A diferença entre map e suas variantes é principalmente o objeto que encontramos na saída, enquanto podemos usar funções auxiliáres do próprio purrr para obter os valores obtidos nas listas criadas com map também podemos usar as outras funções da família map para pular essa etapa.</p>
 <details>
 <summary>
 <strong>Sintaxe segundo a documentação:</strong>
@@ -456,8 +481,11 @@ Função anônima
 </div>
 <p>Isso torna mais fácil entender quais argumentos pertencem a qual função e geralmente resulta em mensagens de erro mais claras.</p>
 </details>
-<p>Por padrão map sempre retorna uma lista, podemos extrair os objetos da lista usando a função reduce do próprio purrr ou usando uma das funções da família map para cada tipo de objeto como pode ser visto nos exemplos abaixo.</p>
-<p>no primeiro exemplo vamos printar todas as funções do pacote purrr que contem a palavra map.</p>
+</section>
+<section id="exemplos" class="level2">
+<h2 class="anchored" data-anchor-id="exemplos">Exemplos</h2>
+<p>Por padrão a função map sempre retorna uma lista, podemos extrair os objetos da lista usando a função reduce do próprio purrr ou usando uma das funções da família map para cada tipo de objeto como pode ser visto nos exemplos abaixo.</p>
+<p>no primeiro exemplo vamos printar todas as funções do pacote purrr que contêm a palavra map.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fcs_map <span class="ot">&lt;-</span> <span class="fu">map</span>(fcs, \(x) <span class="fu">str_detect</span>(x, <span class="st">"map"</span>))</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fcs_map <span class="ot">&lt;-</span> fcs[<span class="fu">unlist</span>(fcs_map)]</span>
@@ -481,25 +509,126 @@ Função anônima
 </div>
 <p>Nesse caso usamos a função unlist para obter um vetor que contem valores lógicos em cada observação, como o número de observações é o mesmo que o vetor de funções do purrr podemos usar isso para acessar apenas as posições em que ocorre a palavra map.</p>
 </section>
-<section id="variações-de-map" class="level2">
-<h2 class="anchored" data-anchor-id="variações-de-map">Variações de map</h2>
+<section id="exemplo-prático-com-visualização-de-dados" class="level2">
+<h2 class="anchored" data-anchor-id="exemplo-prático-com-visualização-de-dados">Exemplo prático com visualização de dados</h2>
+<details>
+<summary>
+gráficos múltiplos
+</summary>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">split</span>(mtcars<span class="sc">$</span>cyl) <span class="sc">|&gt;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(\(df) <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> df)) <span class="sc">|&gt;</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(summary) <span class="sc">|&gt;</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dbl</span>(<span class="st">"r.squared"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Função para plotar um histograma para uma coluna numérica do nosso df</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>plot_histogram <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> x), <span class="fu">aes</span>(<span class="at">x =</span> x)) <span class="sc">+</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(plot)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Aplica a função a cada coluna numérica </span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">map_if</span>(mtcars, is.numeric, plot_histogram)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        4         6         8 
-0.5086326 0.4645102 0.4229655 </code></pre>
+<pre><code>$mpg</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$cyl</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$disp</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$hp</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$drat</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$wt</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$qsec</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-7.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$vs</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-8.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$am</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-9.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$gear</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-10.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+$carb</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-13-11.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</details>
+</section>
+</section>
+<section id="outras-referências" class="level1">
+<h1>Outras referências…</h1>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/bzUmK0Y07ck" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
+</iframe>
+</section>
+<section id="section" class="level1">
+
+
 
 
 </section>
-</section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-transcode2021" class="csl-entry" role="listitem">
+Transcode. 2021. <span>“Coding Basics: While Loops &amp; Do While Loops | Programming for Beginners,”</span> October. <a href="https://www.youtube.com/watch?v=v-K-4KuA8mQ">https://www.youtube.com/watch?v=v-K-4KuA8mQ</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry" role="listitem">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span></span>Tidyverse<span></span>”</span> 4: 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-purrr" class="csl-entry" role="listitem">
+Wickham, Hadley, and Lionel Henry. 2023. <span>“Purrr: Functional Programming Tools.”</span> <a href="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
